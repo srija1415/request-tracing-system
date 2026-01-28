@@ -160,7 +160,7 @@ Failure debugging
 
 Backend system design thinking
 
-🗣️ Interview One-Liner
+🗣️ ## Quick Overview
 
 I built a mini request tracing system that tracks request flow, latency, and failures across multiple microservices, similar to Jaeger.
 
