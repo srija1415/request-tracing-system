@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mini Trace Dashboard</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      margin: 0;
+      padding: 30px;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      color: #fff;
+      margin-bottom: 20px;
+    }
+
+    .controls {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 15px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #00c6ff;
+      color: white;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #0072ff;
+    }
+
+    .dashboard {
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .trace-card {
+      background: white;
+      border-radius: 12px;
+      padding: 15px 20px;
+      margin-bottom: 15px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      animation: fadeIn 0.4s ease;
+    }
+
+    .SUCCESS {
+      border-left: 8px solid #2ecc71;
+    }
+
+    .FAILED {
+      border-left: 8px solid #e74c3c;
+    }
+
+    .trace-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .service {
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .status {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 13px;
+      color: white;
+    }
+
+    .SUCCESS .status {
+      background: #2ecc71;
+    }
+
+    .FAILED .status {
+      background: #e74c3c;
+    }
+
+    .details {
+      font-size: 14px;
+      color: #555;
+    }
+
+    .error {
+      color: #e74c3c;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>🌐 Mini Request Tracing Dashboard</h1>
+
+<div class="controls">
+  <button onclick="loadTraces()">Load Traces</button>
+</div>
+
+<div class="dashboard" id="output"></div>
+
+<script>
+async function loadTraces() {
+  const res = await fetch("http://localhost:4000/traces");
+  const data = await res.json();
+  const output = document.getElementById("output");
+  output.innerHTML = "";
+
+  if (data.length === 0) {
+    output.innerHTML = "<p style='color:white;text-align:center;'>No traces found.</p>";
+    return;
+  }
+
+  data.forEach(t => {
+    const card = document.createElement("div");
+    card.className = "trace-card " + t.status;
+
+    card.innerHTML = `
+      <div class="trace-header">
+        <div class="service">${t.service}</div>
+        <div class="status">${t.status}</div>
+      </div>
+
+      <div class="details">
+        <b>Trace ID:</b> ${t.traceId}<br>
+        <b>Duration:</b> ${t.duration} ms<br>
+        <b>Time:</b> ${new Date(t.timestamp).toLocaleString()}
+      </div>
+
+      ${t.error ? `<div class="error">❌ ${t.error}</div>` : ""}
+    `;
+
+    output.appendChild(card);
+  });
+}
+</script>
+
+</body>
+</html>
